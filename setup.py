@@ -14,4 +14,5 @@ setup(
     url = 'http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav',
     description = 'The navigation bar for Trac',
     entry_points={'trac.plugins': '%s = tracnav' % PACKAGE},
+    licence = 'GPL',
 )
