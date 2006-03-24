@@ -26,14 +26,34 @@ table of contents must include an unordered list of links that should
 be displayed in the navigation bar.
 
 To display the navigation bar on a page, you must call the TracNav
-macro on that page an pass the name of your table of contents as
+macro on that page and pass the name of your table of contents as
 argument.
+
+It is possible to have more than one index page for your toc: Simply
+list them all separated by a bar like this:
+
+[[TracNav(MyTOC|AnotherTOC)]]
+
+The TOCs are appended to each other to form one navigation bar.
 
 
 Installation
 ------------
 
 See http://projects.edgewall.com/trac/wiki/TracPlugins.
+
+Short version for the impatient: run "python ./setup.py bdist_egg" and
+copy the resulting .egg file from the "dist" directory to the
+"plugins" directory of your Trac project. Using the WebAdmin plugin,
+you can even upload and deploy the .egg file to your project using a
+browser.
+
+
+Homepage
+--------
+
+See http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav.
+This page contains a life demo of the plugin, too.
 
 
 Authors and License
