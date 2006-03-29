@@ -55,7 +55,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 """
 __id__        = '$Id$'
-__version__   = '3.91'
+__version__   = '3.92pre1'
 __revision__  = '$LastChangedRevision$'
 
 import re
@@ -196,7 +196,20 @@ class TracNav(Component):
         """
         Main routine of the wiki macro.
         """
+
+        #init
         out = StringIO()
+        names = []
+        collapse = True
+        curpage = req.args.get('page','')
+
+        # parse arguments
+        if args:
+            for arg in args.split('|'):
+                if arg == 'nocollapse':
+                    collapse = False
+                else:
+                    names.append(arg)
         
         # header
         col = 0
@@ -206,17 +219,15 @@ class TracNav(Component):
                   (self.i(col), TRACNAVHOME))
 
         # add TOCs
-        curpage = req.args.get('page','')
-        names = (args or "TOC").split('|')
-
-        for name in names:
+        for name in (names or ["TOC"]):
             toc_text = self.get_toc(req, name)
             toc = self.parse_toc(toc_text, req)
             if not toc:
                 toc = self.parse_toc(' * TOC "%s" is empty!' % name)
-            (found, filtered) = self.filter_toc(curpage, toc)
-            if found:
-                self.display_all(out, req, name, filtered, col)
+            if collapse:
+                (found, filtered) = self.filter_toc(curpage, toc)
+                if found:
+                    self.display_all(out, req, name, filtered, col)
             else:
                 self.display_all(out, req, name, toc, col)
 
