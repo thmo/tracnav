@@ -48,6 +48,12 @@ copy the resulting .egg file from the "dist" directory to the
 you can even upload and deploy the .egg file to your project using a
 browser.
 
+It is very likely that you have to override the location of the
+temporary directory to which .egg files are unpacked by setting the
+PYTHON_EGG_CACHE environment variable in your webserver's
+configuration, see
+http://projects.edgewall.com/trac/wiki/TracPlugins#SettingupthePluginCache
+
 
 Homepage
 --------
