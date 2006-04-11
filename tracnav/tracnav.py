@@ -55,7 +55,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 """
 __id__        = '$Id$'
-__version__   = '3.92pre1'
+__version__   = '3.92pre2'
 __revision__  = '$LastChangedRevision$'
 
 import re
@@ -228,6 +228,8 @@ class TracNav(Component):
                 (found, filtered) = self.filter_toc(curpage, toc)
                 if found:
                     self.display_all(out, req, name, filtered, col)
+                else:
+                    self.display_all(out, req, name, toc, col)
             else:
                 self.display_all(out, req, name, toc, col)
 
