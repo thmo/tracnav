@@ -14,7 +14,7 @@ setup(
     maintainer_email = 'moschny@ipd.uni-karlsruhe.de',
     url = 'http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav',
     description = 'The navigation bar for Trac',
-    entry_points={'trac.plugins': 'TracNav = tracnav'},
+    entry_points={'trac.plugins': ['TracNav = tracnav']},
     keywords = 'trac toc',
     license = 'GPL',
 )

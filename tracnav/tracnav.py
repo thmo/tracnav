@@ -55,7 +55,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 """
 __id__        = '$Id$'
-__version__   = '3.92pre2'
+__version__   = '3.92pre3'
 __revision__  = '$LastChangedRevision$'
 
 import re
