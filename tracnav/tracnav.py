@@ -64,10 +64,7 @@ from trac.wiki.api import WikiSystem, IWikiMacroProvider
 from trac.web.chrome import ITemplateProvider, add_stylesheet
 from trac.wiki.model import WikiPage
 from trac.wiki.formatter import Formatter, OneLinerFormatter
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from StringIO import StringIO
 
 
 TRACNAVHOME = "http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav"
