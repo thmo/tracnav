@@ -311,6 +311,7 @@ class TracNav(Component):
 
     def get_macros(self):
         yield 'TracNav'
+        yield 'JPNav'
 
 
     def render_macro(self, req, name, args):
