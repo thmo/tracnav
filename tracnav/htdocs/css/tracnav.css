@@ -50,10 +50,18 @@
  margin-right: 4ex;
 }
 .wiki-toc.trac-nav .edit {
- position: relative;
+ float: right; 
+ position: absolute; 
+ right: 10px; 
+}
+/* next rule not seen by IE <= IE6 */
+.wiki-toc.trac-nav [class~=edit] {
+ float: none;
+ position: static;
  text-align: right;
- top: -3px; /* shift slightly up */
  height: 0; /* simulate float:right; */
+ top: -3px; /* shift slightly up */
+ right: 0;
 }
 .wiki-toc.trac-nav .edit a {
  color: blue;
