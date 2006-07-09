@@ -55,7 +55,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 """
 __id__        = '$Id$'
-__version__   = '3.92pre4'
+__version__   = '3.92pre5'
 __revision__  = '$LastChangedRevision$'
 
 import re
@@ -274,7 +274,7 @@ class TracNav(Component):
         curpage = req.hdf.getValue('wiki.page_name', '')
 
         if (not preview) and req.hdf.getValue('trac.acl.WIKI_MODIFY', ''):
-            out.write('%s<div class="edit"><a href="%s?edit=yes">edit</a></div>\n' % \
+            out.write('%s<div class="edit"><a href="%s?action=edit">edit</a></div>\n' % \
                     (self.i(col), self.env.href.wiki(name)))
         out.write('%s<ul>\n' % self.i(col))
         col += 1
