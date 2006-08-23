@@ -55,7 +55,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 """
 __id__        = '$Id$'
-__version__   = '3.92pre5'
+__version__   = '3.92pre6'
 __revision__  = '$LastChangedRevision$'
 
 import re
@@ -109,35 +109,51 @@ class TocFormatter(OneLinerFormatter):
     # FIXME: CamelCase links are special and not handled by the Formatter...
 
 
-class TracNav(Component):
+class Invocation(object):
 
-    implements(IWikiMacroProvider, ITemplateProvider)
+    def __init__(self, env, req, args, out):
 
-    def get_toc(self, req, name):
+        #save for later use
+        self.env = env
+        self.req = req
+        self.out = out
+        self.col = 0
+        
+        #needed several times
+        self.preview = req.args.get('preview', '')
+        self.curpage = req.args.get('page', 'WikiStart')
+        self.modify = req.perm.has_permission('WIKI_MODIFY')
+
+        # parse arguments
+        self.names = []
+        self.collapse = True
+        if args:
+            for arg in args.split('|'):
+                if arg == 'nocollapse':
+                    self.collapse = False
+                else:
+                    self.names.append(arg)
+
+    def get_toc(self, name):
         """
         Fetch the wiki page containing the toc, if available.
         """
-        preview = req.args.get('preview', '')
-        curpage = req.args.get('page')
-
-        if preview and name == curpage:
-            return req.args.get('text', '')
+        if self.preview and name == self.curpage:
+            return self.req.args.get('text', '')
         elif WikiSystem(self.env).has_page(name):
             return WikiPage(self.env, name).text
         else:
             return ''
 
-
-    def get_toc_entry(self, toc_text, req):
+    def get_toc_entry(self, toc_text):
         """
         Parse and format the entries in toc_text.
         """
-        formatter = TocFormatter(self.env, req)
+        formatter = TocFormatter(self.env, self.req)
         for match in LISTRULE.finditer(toc_text):
             indent = len(match.group('indent'))
             label, link = formatter.format_toc(match.group('rest'))
             yield indent, link, label
-
 
     def get_toc_entry_and_indent(self, gen):
         """
@@ -153,7 +169,6 @@ class TracNav(Component):
                 return
             yield indent
             yield link, label        
-
 
     def _parse_toc(self, gen, next_indent, level = 0):
         """
@@ -178,81 +193,64 @@ class TracNav(Component):
                 assert next_indent < level
                 return toclist, next_indent
 
-
-    def parse_toc(self, toc_text, req = None):
+    def parse_toc(self, toc_text):
         """
         Recursively construct the toc tree using _parse_toc().
         """
-        gen = self.get_toc_entry(toc_text, req)
-        gen = self.get_toc_entry_and_indent(gen)
+        gen = self.get_toc_entry_and_indent(self.get_toc_entry(toc_text))
         toc, _ = self._parse_toc(gen, gen.next())
         return toc
 
+    def write(self, what):
+        self.out.write(' ' * self.col)
+        self.out.write(what)
+        return self
 
-    def execute(self, req, args):
+    def indent_more(self):
+        self.col += 1
+        return self
+
+    def indent_less(self):
+        self.col -= 1
+        return self
+
+    def run(self):
         """
         Main routine of the wiki macro.
         """
-
-        #init
-        out = StringIO()
-        names = []
-        collapse = True
-        curpage = req.args.get('page','')
-
-        # parse arguments
-        if args:
-            for arg in args.split('|'):
-                if arg == 'nocollapse':
-                    collapse = False
-                else:
-                    names.append(arg)
-        
         # header
-        col = 0
-        out.write('%s<div class="wiki-toc trac-nav">\n' % self.i(col))
-        col += 1
-        out.write('%s<h2><a href="%s">TracNav</a> menu</h2>\n' % \
-                  (self.i(col), TRACNAVHOME))
+        self.write('<div class="wiki-toc trac-nav">\n').indent_more()
+        self.write('<h2><a href="%s">TracNav</a> menu</h2>\n' % TRACNAVHOME)
 
         # add TOCs
-        for name in (names or ["TOC"]):
-            toc_text = self.get_toc(req, name)
-            toc = self.parse_toc(toc_text, req)
+        for name in (self.names or ["TOC"]):
+            toc = self.parse_toc(self.get_toc(name))
             if not toc:
                 toc = self.parse_toc(' * TOC "%s" is empty!' % name)
-            if collapse:
-                (found, filtered) = self.filter_toc(curpage, toc)
-                if found:
-                    self.display_all(out, req, name, filtered, col)
-                else:
-                    self.display_all(out, req, name, toc, col)
+            found, filtered = self.filter_toc(toc)
+            if (not self.collapse) or (not found):
+                self.display_all(name, toc)
             else:
-                self.display_all(out, req, name, toc, col)
+                self.display_all(name, filtered)
 
-        # footer 
-        col -= 1
-        out.write('%s</div>\n' % self.i(col))
+        # footer
+        self.indent_less().write('</div>\n')
 
         # add our stylesheet
-        add_stylesheet(req, 'tracnav/css/tracnav.css')
+        add_stylesheet(self.req, 'tracnav/css/tracnav.css')
 
-        # emit 
-        return out.getvalue()
-
-
-    def filter_toc(self, curpage, toc, level = 0):
-        found = 0
+    def filter_toc(self, toc, level = 0):
+        found = False
         result = []
         for name, title, sub in toc:
             if sub == None:
-                if name == curpage:
-                    found = 1
+                if name == self.curpage:
+                    found = True
                 result.append((name, title, None))
             else:
-                (subfound, subtoc) = self.filter_toc(curpage, sub, level + 1)
+                subfound, subtoc = self.filter_toc(sub, level + 1)
                 if subfound:
-                    found = 1
+                    found = True
                 if subfound or (name == None):
                     if level == 0 and name != None:
                         prepended = [(name, title, subtoc)]
@@ -262,70 +260,57 @@ class TracNav(Component):
                         result.append((name, title, subtoc))
                 else:
                     result.append((name, title, []))
-        return (found, result)
+        return found, result
 
+    def display_all(self, name, toc):
+        if (not self.preview) and (self.modify):
+            self.write('<div class="edit"><a href="%s?action=edit">edit</a></div>\n' % \
+                self.env.href.wiki(name))
+        self.write('<ul>\n').indent_more()
+        self.display(toc, 0)
+        self.indent_less().write('</ul>\n')
 
-    def i(self, col):
-        return ' ' * col
-
-
-    def display_all(self, out, req, name, toc, col):
-        preview = req.hdf.getValue('args.preview', '')
-        curpage = req.hdf.getValue('wiki.page_name', '')
-
-        if (not preview) and req.hdf.getValue('trac.acl.WIKI_MODIFY', ''):
-            out.write('%s<div class="edit"><a href="%s?action=edit">edit</a></div>\n' % \
-                    (self.i(col), self.env.href.wiki(name)))
-        out.write('%s<ul>\n' % self.i(col))
-        col += 1
-        self.display(out, curpage, toc, 0, col)
-        col -= 1
-        out.write('%s</ul>\n' % self.i(col))
-
-
-    def display(self, out, curpage, toc, depth, col):
+    def display(self, toc, depth):
         for name, title, sub in toc:
             li_style = ' style="padding-left: %dem;"' % (depth + 1)
             if sub == None:
-                if name == curpage:
+                if name == self.curpage:
                     cls = ' class="active"'
                 else:
                     cls = ''
-                out.write('%s<li%s%s>%s</li>\n' % \
-                        (self.i(col), li_style, cls, title))
+                self.write('<li%s%s>%s</li>\n' % (li_style, cls, title))
             else:
-                out.write('%s<li%s>\n' % (self.i(col), li_style))
-                col += 1
+                self.write('<li%s>\n' % li_style).indent_more()
                 if name == None or sub:
-                    out.write('%s<h4>%s</h4>\n' % (self.i(col), title))
+                    self.write('<h4>%s</h4>\n' % title)
                 else:
-                    out.write('%s<h4>%s...</h4>\n' % (self.i(col), title))
-                col -= 1
-                out.write('%s</li>\n' % self.i(col))
+                    self.write('<h4>%s...</h4>\n' % title)
+                self.indent_less().write('</li>\n')
                 if len(sub) > 0:
-                    self.display(out, curpage, sub, depth + 1, col)
+                    self.display(sub, depth + 1)
 
+
+class TracNav(Component):
+
+    implements(IWikiMacroProvider, ITemplateProvider)
 
     def get_macros(self):
         yield 'TracNav'
-        yield 'JPNav'
-
+        yield 'JPNav' # legacy
 
     def render_macro(self, req, name, args):
-        return self.execute(req, args)
-    
+        out = StringIO()
+        Invocation(self.env, req, args, out).run()
+        return out.getvalue()
 
     def get_macro_description(self, name):
         from inspect import getdoc, getmodule
         return getdoc(getmodule(self))
 
-
     def get_htdocs_dirs(self):
         from pkg_resources import resource_filename
         return [('tracnav', resource_filename(__name__, 'htdocs'))]
 
-
     def get_templates_dirs(self):
         # we don't provide templates
         return []
-    
