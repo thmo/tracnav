@@ -1,1 +1,1 @@
-from tracnav import *
+__version__ = '3.92pre7'

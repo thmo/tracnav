@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
 from setuptools import setup
-from tracnav.tracnav import __version__ as version
+from tracnav import __version__ as VERSION
 
 setup(
     name = 'TracNav',
-    version = version,
+    version = VERSION,
     packages = ['tracnav'],
     package_data = { 'tracnav': ['htdocs/css/*.css'] },
     author = 'Bernhard Haumacher',
@@ -14,7 +14,7 @@ setup(
     maintainer_email = 'moschny@ipd.uni-karlsruhe.de',
     url = 'http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav',
     description = 'The navigation bar for Trac',
-    entry_points={'trac.plugins': ['TracNav = tracnav']},
+    entry_points={'trac.plugins': ['TracNav = tracnav.tracnav']},
     keywords = 'trac toc',
     license = 'GPL',
 )
