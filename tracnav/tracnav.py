@@ -33,9 +33,8 @@ Please visit: http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav.
 
 == Author and License ==
 
-Copyright 2005, 2006
- *  Bernhard Haumacher (haui at haumacher.de)
- *  Thomas Moschny (moschny at ipd.uni-karlsruhe.de)
+ * Copyright 2005-2006, Bernhard Haumacher (haui at haumacher.de)
+ * Copyright 2005-2007, Thomas Moschny (moschny at ipd.uni-karlsruhe.de)
 
 {{{
 This program is free software; you can redistribute it and/or modify
@@ -76,33 +75,30 @@ class TocFormatter(OneLinerFormatter):
     Basically the OneLinerFormatter, but additionally remembers the
     last wiki link.
     """
+    def __init__(self, context):
+        OneLinerFormatter.__init__(self, context)
+        self.lastlink = None
+
     def format_toc(self, wikitext):
-        self.link = None
+        self.lastlink = None
         out = StringIO()
         OneLinerFormatter.format(self, wikitext, out)
-        return out.getvalue(), self.link
-
-    def __init__(self, env, req = None):
-        OneLinerFormatter.__init__(self, env)
-        # OneLinerFormatter sets req to None
-        self.req = req
-        self.link = None
+        return out.getvalue(), self.lastlink
 
     def _make_link(self, namespace, target, match, label):
         if namespace == 'wiki':
-            self.link = target
+            self.lastlink = target
         return OneLinerFormatter._make_link(
             self, namespace, target, match, label)
 
     def _macro_formatter(self, match, fullmatch):
         name = fullmatch.group('macroname').lower()
-        if name == 'br':
-            return ' '
-        elif name in ALLOWED_MACROS:
+        if name in ALLOWED_MACROS:
             # leapfrog the OneLinerFormatter
             return Formatter._macro_formatter(self, match, fullmatch)
         else:
-            return ''
+            # use the OneLinerFormatter
+            return OneLinerFormatter._macro_formatter(self, match, fullmatch)
 
     # FIXME: what about _make_relative_link() ?
     # FIXME: CamelCase links are special and not handled by the Formatter...
@@ -110,18 +106,23 @@ class TocFormatter(OneLinerFormatter):
 
 class Invocation(object):
 
-    def __init__(self, env, req, args, out):
+    def __init__(self, formatter, args, out):
 
-        #save for later use
-        self.env = env
-        self.req = req
+        # save for later use
+        self.formatter = formatter
+
+        # shortcuts
+        self.env = formatter.env
+        self.req = formatter.req
+
+        # output
         self.out = out
         self.col = 0
         
-        #needed several times
-        self.preview = req.args.get('preview', '')
-        self.curpage = req.args.get('page', 'WikiStart')
-        self.modify = req.perm.has_permission('WIKI_MODIFY')
+        # needed several times
+        self.preview = self.req.args.get('preview', '')
+        self.curpage = self.req.args.get('page', 'WikiStart')
+        self.modify = self.req.perm.has_permission('WIKI_MODIFY')
 
         # parse arguments
         self.names = []
@@ -148,7 +149,7 @@ class Invocation(object):
         """
         Parse and format the entries in toc_text.
         """
-        formatter = TocFormatter(self.env, self.req)
+        formatter = TocFormatter(self.formatter.context)
         for match in LISTRULE.finditer(toc_text):
             indent = len(match.group('indent'))
             label, link = formatter.format_toc(match.group('rest'))
@@ -297,9 +298,9 @@ class TracNav(Component):
         yield 'TracNav'
         yield 'JPNav' # legacy
 
-    def render_macro(self, req, name, args):
+    def render_macro(self, formatter, name, args):
         out = StringIO()
-        Invocation(self.env, req, args, out).run()
+        Invocation(formatter, args, out).run()
         return out.getvalue()
 
     def get_macro_description(self, name):
