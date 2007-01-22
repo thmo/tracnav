@@ -265,7 +265,7 @@ class Invocation(object):
     def display_all(self, name, toc):
         if (not self.preview) and (self.modify):
             self.write('<div class="edit"><a href="%s?action=edit">edit</a></div>\n' % \
-                self.env.href.wiki(name))
+                self.req.href.wiki(name))
         self.write('<ul>\n').indent_more()
         self.display(toc, 0)
         self.indent_less().write('</ul>\n')
