@@ -298,7 +298,7 @@ class TracNav(Component):
         yield 'TracNav'
         yield 'JPNav' # legacy
 
-    def render_macro(self, formatter, name, args):
+    def expand_macro(self, formatter, name, args):
         out = StringIO()
         Invocation(formatter, args, out).run()
         return out.getvalue()
