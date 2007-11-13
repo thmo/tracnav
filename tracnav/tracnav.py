@@ -75,8 +75,8 @@ class TocFormatter(OneLinerFormatter):
     Basically the OneLinerFormatter, but additionally remembers the
     last wiki link.
     """
-    def __init__(self, context):
-        OneLinerFormatter.__init__(self, context)
+    def __init__(self, env, ctx):
+        OneLinerFormatter.__init__(self, env, ctx)
         self.lastlink = None
 
     def format_toc(self, wikitext):
@@ -108,12 +108,10 @@ class Invocation(object):
 
     def __init__(self, formatter, args, out):
 
-        # save for later use
-        self.formatter = formatter
-
         # shortcuts
         self.env = formatter.env
         self.req = formatter.req
+        self.ctx = formatter.context
 
         # output
         self.out = out
@@ -149,7 +147,7 @@ class Invocation(object):
         """
         Parse and format the entries in toc_text.
         """
-        formatter = TocFormatter(self.formatter.context)
+        formatter = TocFormatter(self.env, self.ctx)
         for match in LISTRULE.finditer(toc_text):
             indent = len(match.group('indent'))
             label, link = formatter.format_toc(match.group('rest'))
