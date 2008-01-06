@@ -34,7 +34,7 @@ Please visit: http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav.
 == Author and License ==
 
  * Copyright 2005-2006, Bernhard Haumacher (haui at haumacher.de)
- * Copyright 2005-2007, Thomas Moschny (moschny at ipd.uni-karlsruhe.de)
+ * Copyright 2005-2008, Thomas Moschny (moschny at ipd.uni-karlsruhe.de)
 
 {{{
 This program is free software; you can redistribute it and/or modify
@@ -126,9 +126,11 @@ class Invocation(object):
         self.names = []
         self.collapse = True
         if args:
-            for arg in args.split('|'):
+            for arg in map(lambda a: a.strip(), args.split('|')):
                 if arg == 'nocollapse':
                     self.collapse = False
+                elif arg == 'noedit':
+                    self.modify = False
                 else:
                     self.names.append(arg)
 
@@ -310,5 +312,4 @@ class TracNav(Component):
         return [('tracnav', resource_filename(__name__, 'htdocs'))]
 
     def get_templates_dirs(self):
-        # we don't provide templates
-        return []
+        return [] # we don't provide templates
