@@ -125,12 +125,15 @@ class Invocation(object):
         # parse arguments
         self.names = []
         self.collapse = True
+        self.reorder = True
         if args:
             for arg in map(lambda a: a.strip(), args.split('|')):
                 if arg == 'nocollapse':
                     self.collapse = False
                 elif arg == 'noedit':
                     self.modify = False
+                elif arg == 'noreorder':
+                    self.reorder = False
                 else:
                     self.names.append(arg)
 
@@ -244,18 +247,14 @@ class Invocation(object):
         result = []
         for name, title, sub in toc:
             if sub == None:
-                if name == self.curpage:
-                    found = True
+                found |= name == self.curpage
                 result.append((name, title, None))
             else:
                 subfound, subtoc = self.filter_toc(sub, level + 1)
-                if subfound:
-                    found = True
+                found |= subfound
                 if subfound or (name == None):
-                    if level == 0 and name != None:
-                        prepended = [(name, title, subtoc)]
-                        prepended.extend(result)
-                        result = prepended
+                    if level == 0 and name != None and self.reorder:
+                        result.insert(0, (name, title, subtoc))
                     else:
                         result.append((name, title, subtoc))
                 else:
