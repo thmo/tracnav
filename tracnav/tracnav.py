@@ -62,6 +62,8 @@ from trac.wiki.api import WikiSystem, IWikiMacroProvider
 from trac.web.chrome import ITemplateProvider, add_stylesheet
 from trac.wiki.model import WikiPage
 from trac.wiki.formatter import Formatter, OneLinerFormatter
+from trac.util.html import Markup
+from genshi.builder import tag
 from StringIO import StringIO
 
 
@@ -106,17 +108,13 @@ class TocFormatter(OneLinerFormatter):
 
 class Invocation(object):
 
-    def __init__(self, formatter, args, out):
+    def __init__(self, formatter, args):
 
         # shortcuts
         self.env = formatter.env
         self.req = formatter.req
         self.ctx = formatter.context
 
-        # output
-        self.out = out
-        self.col = 0
-        
         # needed several times
         self.preview = self.req.args.get('preview', '')
         self.curpage = self.req.args.get('page', 'WikiStart')
@@ -204,26 +202,14 @@ class Invocation(object):
         toc, _ = self._parse_toc(gen, gen.next())
         return toc
 
-    def write(self, what):
-        self.out.write(' ' * self.col)
-        self.out.write(what)
-        return self
-
-    def indent_more(self):
-        self.col += 1
-        return self
-
-    def indent_less(self):
-        self.col -= 1
-        return self
-
     def run(self):
         """
         Main routine of the wiki macro.
         """
+        out = tag.div(class_="wiki-toc trac-nav")
+
         # header
-        self.write('<div class="wiki-toc trac-nav">\n').indent_more()
-        self.write('<h2><a href="%s">TracNav</a> menu</h2>\n' % TRACNAVHOME)
+        out.append(tag.h2(tag.a("TracNav", href=TRACNAVHOME)))
 
         # add TOCs
         for name in (self.names or ["TOC"]):
@@ -232,15 +218,15 @@ class Invocation(object):
                 toc = self.parse_toc(' * TOC "%s" is empty!' % name)
             found, filtered = self.filter_toc(toc)
             if (not self.collapse) or (not found):
-                self.display_all(name, toc)
+                self.display_all(name, toc, out)
             else:
-                self.display_all(name, filtered)
-
-        # footer
-        self.indent_less().write('</div>\n')
+                self.display_all(name, filtered, out)
 
         # add our stylesheet
         add_stylesheet(self.req, 'tracnav/css/tracnav.css')
+
+        # done
+        return out
 
     def filter_toc(self, toc, level = 0):
         found = False
@@ -261,32 +247,29 @@ class Invocation(object):
                     result.append((name, title, []))
         return found, result
 
-    def display_all(self, name, toc):
+    def display_all(self, name, toc, out):
         if (not self.preview) and (self.modify):
-            self.write('<div class="edit"><a href="%s?action=edit">edit</a></div>\n' % \
-                self.req.href.wiki(name))
-        self.write('<ul>\n').indent_more()
-        self.display(toc, 0)
-        self.indent_less().write('</ul>\n')
+            out.append(tag.div(
+                    tag.a("edit", href="%s?action=edit" % self.req.href.wiki(name)),
+                    class_="edit"))
+        ul = tag.ul()
+        self.display(toc, 0, ul)
+        out.append(ul)
 
-    def display(self, toc, depth):
+    def display(self, toc, depth, ul):
         for name, title, sub in toc:
-            li_style = ' style="padding-left: %dem;"' % (depth + 1)
+            style = "padding-left: %dem;" % (depth + 1)
             if sub == None:
-                if name == self.curpage:
-                    cls = ' class="active"'
-                else:
-                    cls = ''
-                self.write('<li%s%s>%s</li>\n' % (li_style, cls, title))
+                ul.append(tag.li(
+                        Markup(title),
+                        style=style,
+                        class_= (name == self.curpage) and "active" or None))
             else:
-                self.write('<li%s>\n' % li_style).indent_more()
-                if name == None or sub:
-                    self.write('<h4>%s</h4>\n' % title)
-                else:
-                    self.write('<h4>%s...</h4>\n' % title)
-                self.indent_less().write('</li>\n')
+                ul.append(tag.li(
+                        tag.h4(Markup(title), (name == None or sub) and "..." or None),
+                        style=style))
                 if len(sub) > 0:
-                    self.display(sub, depth + 1)
+                    self.display(sub, depth + 1, ul)
 
 
 class TracNav(Component):
@@ -298,9 +281,7 @@ class TracNav(Component):
         yield 'JPNav' # legacy
 
     def expand_macro(self, formatter, name, args):
-        out = StringIO()
-        Invocation(formatter, args, out).run()
-        return out.getvalue()
+        return Invocation(formatter, args).run()
 
     def get_macro_description(self, name):
         from inspect import getdoc, getmodule
