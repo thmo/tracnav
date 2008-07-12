@@ -87,11 +87,11 @@ class TocFormatter(OneLinerFormatter):
         OneLinerFormatter.format(self, wikitext, out)
         return out.getvalue(), self.lastlink
 
-    def _make_link(self, namespace, target, match, label):
+    def _make_link(self, namespace, target, *args):
         if namespace == 'wiki':
             self.lastlink = target
         return OneLinerFormatter._make_link(
-            self, namespace, target, match, label)
+            self, namespace, target, *args)
 
     def _macro_formatter(self, match, fullmatch):
         name = fullmatch.group('macroname').lower()
