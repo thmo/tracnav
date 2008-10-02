@@ -248,7 +248,7 @@ class Invocation(object):
         return found, result
 
     def display_all(self, name, toc, out):
-        if (not self.preview) and (self.modify):
+        if (not self.preview) and self.modify:
             out.append(tag.div(
                     tag.a("edit", href="%s?action=edit" % self.req.href.wiki(name)),
                     class_="edit"))
@@ -261,8 +261,9 @@ class Invocation(object):
                         Markup(title),
                         class_= (name == self.curpage) and "active" or None))
             else:
+                show_dots = not (name == None or sub)
                 ul.append(tag.li(
-                        tag.h4(Markup(title), (name == None or sub) and "..." or None)))
+                        tag.h4(Markup(title), show_dots and "..." or None)))
                 if len(sub) > 0:
                     ul.append(self.display(sub, tag.ul()))
         return ul
