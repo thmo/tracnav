@@ -252,24 +252,20 @@ class Invocation(object):
             out.append(tag.div(
                     tag.a("edit", href="%s?action=edit" % self.req.href.wiki(name)),
                     class_="edit"))
-        ul = tag.ul()
-        self.display(toc, 0, ul)
-        out.append(ul)
+        out.append(self.display(toc, tag.ul()))
 
-    def display(self, toc, depth, ul):
+    def display(self, toc, ul):
         for name, title, sub in toc:
-            style = "padding-left: %dem;" % (depth + 1)
             if sub == None:
                 ul.append(tag.li(
                         Markup(title),
-                        style=style,
                         class_= (name == self.curpage) and "active" or None))
             else:
                 ul.append(tag.li(
-                        tag.h4(Markup(title), (name == None or sub) and "..." or None),
-                        style=style))
+                        tag.h4(Markup(title), (name == None or sub) and "..." or None)))
                 if len(sub) > 0:
-                    self.display(sub, depth + 1, ul)
+                    ul.append(self.display(sub, tag.ul()))
+        return ul
 
 
 class TracNav(Component):
