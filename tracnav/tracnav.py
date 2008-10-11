@@ -228,23 +228,19 @@ class Invocation(object):
         # done
         return out
 
-    def filter_toc(self, toc, level = 0):
-        found = False
+    def filter_toc(self, toc, level = 0, found = False):
         result = []
         for name, title, sub in toc:
-            if sub == None:
-                found |= name == self.curpage
-                result.append((name, title, None))
+            foundhere = name == self.curpage
+            if sub is not None:
+                foundhere, sub = self.filter_toc(sub, level + 1, foundhere)
+                if not (foundhere or name is None):
+                    sub = []
+            if self.reorder and level is 0 and foundhere:
+                result.insert(0, (name, title, sub))
             else:
-                subfound, subtoc = self.filter_toc(sub, level + 1)
-                found |= subfound
-                if subfound or (name == None):
-                    if level == 0 and name != None and self.reorder:
-                        result.insert(0, (name, title, subtoc))
-                    else:
-                        result.append((name, title, subtoc))
-                else:
-                    result.append((name, title, []))
+                result.append((name, title, sub))
+            found |= foundhere
         return found, result
 
     def display_all(self, name, toc, out):
