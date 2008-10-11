@@ -16,5 +16,5 @@ setup(
     description = 'The Navigation Bar for Trac',
     entry_points={'trac.plugins': ['TracNav = tracnav.tracnav']},
     keywords = 'trac toc',
-    license = 'GPL',
+    license = 'GPLv2+',
 )
