@@ -173,7 +173,7 @@ class Invocation(object):
                 yield -1
                 return
             yield indent
-            yield link, label        
+            yield link, label
 
     def _parse_toc(self, gen, next_indent, level = 0):
         """
