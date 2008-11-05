@@ -69,7 +69,6 @@ from StringIO import StringIO
 
 TRACNAVHOME = "http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav"
 LISTRULE = re.compile(r"^(?P<indent>[ \t\v]+)\* +(?P<rest>.*)$", re.M)
-ALLOWED_MACROS = ["image"]
 
 
 class TocFormatter(OneLinerFormatter):
@@ -77,9 +76,10 @@ class TocFormatter(OneLinerFormatter):
     Basically the OneLinerFormatter, but additionally remembers the
     last wiki link.
     """
-    def __init__(self, env, ctx):
+    def __init__(self, env, ctx, allowed_macros=[]):
         OneLinerFormatter.__init__(self, env, ctx)
         self.lastlink = None
+        self.allowed_macros = allowed_macros
 
     def format_toc(self, wikitext):
         self.lastlink = None
@@ -94,8 +94,8 @@ class TocFormatter(OneLinerFormatter):
             self, namespace, target, *args)
 
     def _macro_formatter(self, match, fullmatch):
-        name = fullmatch.group('macroname').lower()
-        if name in ALLOWED_MACROS:
+        name = fullmatch.group('macroname')
+        if name in self.allowed_macros:
             # leapfrog the OneLinerFormatter
             return Formatter._macro_formatter(self, match, fullmatch)
         else:
@@ -124,14 +124,18 @@ class Invocation(object):
         self.names = []
         self.collapse = True
         self.reorder = True
+        self.allowed_macros = 'Image'
         if args:
-            for arg in map(lambda a: a.strip(), args.split('|')):
+            for arg, _, values in map(lambda s: s.partition('='), args.split('|')):
+                arg = arg.strip()
                 if arg == 'nocollapse':
                     self.collapse = False
                 elif arg == 'noedit':
                     self.modify = False
                 elif arg == 'noreorder':
                     self.reorder = False
+                elif arg == 'allowed_macros':
+                    self.allowed_macros = map(lambda s: s.strip(), values.split(','))
                 else:
                     self.names.append(arg)
 
@@ -150,7 +154,7 @@ class Invocation(object):
         """
         Parse and format the entries in toc_text.
         """
-        formatter = TocFormatter(self.env, self.ctx)
+        formatter = TocFormatter(self.env, self.ctx, self.allowed_macros)
         for match in LISTRULE.finditer(toc_text):
             indent = len(match.group('indent'))
             label, link = formatter.format_toc(match.group('rest'))
