@@ -40,7 +40,7 @@ The TOCs are appended to each other to form one navigation bar.
 Installation
 ------------
 
-See http://projects.edgewall.com/trac/wiki/TracPlugins.
+See http://trac.edgewall.org/wiki/TracPlugins.
 
 Short version for the impatient: run "python ./setup.py bdist_egg" and
 copy the resulting .egg file from the "dist" directory to the
@@ -52,7 +52,7 @@ It is very likely that you have to override the location of the
 temporary directory to which .egg files are unpacked by setting the
 PYTHON_EGG_CACHE environment variable in your webserver's
 configuration, see
-http://projects.edgewall.com/trac/wiki/TracPlugins#SettingupthePluginCache
+http://trac.edgewall.org/wiki/TracPlugins#SettingupthePluginCache.
 
 
 Homepage
@@ -66,7 +66,7 @@ Authors and License
 -------------------
 
 Copyright 2005-2006, Bernhard Haumacher (haui at haumacher.de)
-Copyright 2005-2007, Thomas Moschny (moschny at ipd.uni-karlsruhe.de)
+Copyright 2005-2008, Thomas Moschny (thomas.moschny at gmx.de)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

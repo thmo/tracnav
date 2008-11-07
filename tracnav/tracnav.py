@@ -13,7 +13,7 @@ that it does not support hierarchical ordering.
 
 == Installation ==
 
-See http://projects.edgewall.com/trac/wiki/TracPlugins.
+See http://trac.edgewall.org/wiki/TracPlugins.
 
 == Usage ==
 
@@ -34,7 +34,7 @@ Please visit: http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav.
 == Author and License ==
 
  * Copyright 2005-2006, Bernhard Haumacher (haui at haumacher.de)
- * Copyright 2005-2008, Thomas Moschny (moschny at ipd.uni-karlsruhe.de)
+ * Copyright 2005-2008, Thomas Moschny (thomas.moschny at gmx.de)
 
 {{{
 This program is free software; you can redistribute it and/or modify
