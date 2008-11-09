@@ -74,7 +74,7 @@ LISTRULE = re.compile(r"^(?P<indent>[ \t\v]+)\* +(?P<rest>.*)$", re.M)
 def _partition(s, c):
     i = s.find(c)
     if i >= 0:
-        return s[:i], s[i+1:]
+        return s[:i], s[i+len(c):]
     else:
         return s, ''
 
