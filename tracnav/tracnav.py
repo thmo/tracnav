@@ -70,6 +70,8 @@ from StringIO import StringIO
 TRACNAVHOME = "http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav"
 LISTRULE = re.compile(r"^(?P<indent>[ \t\v]+)\* +(?P<rest>.*)$", re.M)
 
+# Python 2.4 compatibility
+def _partition(s, c): return (s+c).split(c)[0:2]
 
 class TocFormatter(OneLinerFormatter):
     """
@@ -126,7 +128,7 @@ class Invocation(object):
         self.reorder = True
         self.allowed_macros = 'Image'
         if args:
-            for arg, _, values in map(lambda s: s.partition('='), args.split('|')):
+            for arg, values in map(lambda s: _partition(s, '='), args.split('|')):
                 arg = arg.strip()
                 if arg == 'nocollapse':
                     self.collapse = False
