@@ -71,7 +71,12 @@ TRACNAVHOME = "http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav"
 LISTRULE = re.compile(r"^(?P<indent>[ \t\v]+)\* +(?P<rest>.*)$", re.M)
 
 # Python 2.4 compatibility
-def _partition(s, c): return (s+c).split(c)[0:2]
+def _partition(s, c):
+    i = s.find(c)
+    if i >= 0:
+        return s[:i], s[i+1:]
+    else:
+        return s, ''
 
 class TocFormatter(OneLinerFormatter):
     """
