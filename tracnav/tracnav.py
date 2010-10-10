@@ -64,6 +64,7 @@ from trac.wiki.model import WikiPage
 from trac.wiki.formatter import Formatter, OneLinerFormatter
 from trac.util.html import Markup
 from trac.util import arity
+from trac.config import BoolOption
 from genshi.builder import tag
 from StringIO import StringIO
 
@@ -288,9 +289,15 @@ class TracNav(Component):
 
     implements(IWikiMacroProvider, ITemplateProvider)
 
+    # global configuration otions
+    provide_jpnav = BoolOption('tracnav', 'provide_jpnav', default=False,
+                               doc='''Legacy: Also provide macro as 'JPNav'.''')
+
     def get_macros(self):
         yield 'TracNav'
-        yield 'JPNav' # legacy
+        if self.provide_jpnav:
+            # legacy
+            yield 'JPNav'
 
     def expand_macro(self, formatter, name, args):
         return Invocation(formatter, args).run()
