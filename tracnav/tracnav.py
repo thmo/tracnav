@@ -34,7 +34,7 @@ Please visit: http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav.
 == Author and License ==
 
  * Copyright 2005-2006, Bernhard Haumacher (haui at haumacher.de)
- * Copyright 2005-2008, Thomas Moschny (thomas.moschny at gmx.de)
+ * Copyright 2005-2010, Thomas Moschny (thomas.moschny at gmx.de)
 
 {{{
 This program is free software; you can redistribute it and/or modify
@@ -63,6 +63,7 @@ from trac.web.chrome import ITemplateProvider, add_stylesheet
 from trac.wiki.model import WikiPage
 from trac.wiki.formatter import Formatter, OneLinerFormatter
 from trac.util.html import Markup
+from trac.util import arity
 from genshi.builder import tag
 from StringIO import StringIO
 
@@ -87,6 +88,7 @@ class TocFormatter(OneLinerFormatter):
         OneLinerFormatter.__init__(self, env, ctx)
         self.lastlink = None
         self.allowed_macros = allowed_macros
+        self.mf_argcount = arity(OneLinerFormatter._macro_formatter)
 
     def format_toc(self, wikitext):
         self.lastlink = None
@@ -100,14 +102,20 @@ class TocFormatter(OneLinerFormatter):
         return OneLinerFormatter._make_link(
             self, namespace, target, *args)
 
-    def _macro_formatter(self, match, fullmatch):
+    def _macro_formatter(self, match, fullmatch, macro=None):
         name = fullmatch.group('macroname')
         if name in self.allowed_macros:
             # leapfrog the OneLinerFormatter
-            return Formatter._macro_formatter(self, match, fullmatch)
+            if self.mf_argcount == 4:
+                return Formatter._macro_formatter(self, match, fullmatch, macro)
+            else:
+                return Formatter._macro_formatter(self, match, fullmatch)
         else:
             # use the OneLinerFormatter
-            return OneLinerFormatter._macro_formatter(self, match, fullmatch)
+            if self.mf_argcount == 4:
+                return OneLinerFormatter._macro_formatter(self, match, fullmatch, macro)
+            else:
+                return OneLinerFormatter._macro_formatter(self, match, fullmatch)
 
     # FIXME: what about _make_relative_link() ?
     # FIXME: CamelCase links are special and not handled by the Formatter...
