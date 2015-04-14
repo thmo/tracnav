@@ -29,7 +29,7 @@ argument.
 
 == Additional information and a life example ==
 
-Please visit: http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav.
+Please visit: https://svn.ipd.kit.edu/trac/javaparty/wiki/TracNav.
 
 == Author and License ==
 
@@ -69,7 +69,7 @@ from genshi.builder import tag
 from StringIO import StringIO
 
 
-TRACNAVHOME = "http://svn.ipd.uka.de/trac/javaparty/wiki/TracNav"
+TRACNAVHOME = "https://svn.ipd.kit.edu/trac/javaparty/wiki/TracNav"
 LISTRULE = re.compile(r"^(?P<indent>[ \t\v]+)\* +(?P<rest>.*)$", re.M)
 
 # Python 2.4 compatibility
