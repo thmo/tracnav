@@ -279,7 +279,7 @@ class Invocation(object):
             else:
                 show_dots = not (name == None or sub)
                 ul.append(tag.li(
-                        tag.h4(Markup(title), show_dots and "..." or None)))
+                        tag.h4(Markup(title), show_dots and u"\u2026" or None)))
                 if len(sub) > 0:
                     ul.append(self.display(sub, tag.ul()))
         return ul
