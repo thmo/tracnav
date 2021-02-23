@@ -276,11 +276,10 @@ class Invocation(object):
             if sub is None:
                 ul.append(tag.li(
                         Markup(title),
-                        class_= (name == self.curpage) and "active" or None))
+                        class_="active" if name == self.curpage else None))
             else:
-                show_dots = not (name is None or sub)
-                ul.append(tag.li(
-                        Markup(title), show_dots and u"\u2026" or None))
+                dots = u"\u2026" if name is not None and not sub else None
+                ul.append(tag.li(Markup(title), dots))
                 if len(sub) > 0:
                     ul.append(self.display(sub, tag.ul()))
         return ul
