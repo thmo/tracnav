@@ -257,7 +257,7 @@ class Invocation(object):
                 foundhere, sub = self.filter_toc(sub, level + 1, foundhere)
                 if not (foundhere or name is None):
                     sub = []
-            if self.reorder and level is 0 and foundhere:
+            if self.reorder and level == 0 and foundhere:
                 result.insert(0, (name, title, sub))
             else:
                 result.append((name, title, sub))
@@ -273,12 +273,12 @@ class Invocation(object):
 
     def display(self, toc, ul):
         for name, title, sub in toc:
-            if sub == None:
+            if sub is None:
                 ul.append(tag.li(
                         Markup(title),
                         class_= (name == self.curpage) and "active" or None))
             else:
-                show_dots = not (name == None or sub)
+                show_dots = not (name is None or sub)
                 ul.append(tag.li(
                         Markup(title), show_dots and u"\u2026" or None))
                 if len(sub) > 0:
