@@ -304,7 +304,8 @@ class TracNav(Component):
 
     def get_htdocs_dirs(self):
         from pkg_resources import resource_filename
-        return [('tracnav', resource_filename(__name__, 'htdocs'))]
+        yield ('tracnav', resource_filename(__name__, 'htdocs'))
 
     def get_templates_dirs(self):
-        return [] # we don't provide templates
+        return
+        yield  # we don't provide templates
