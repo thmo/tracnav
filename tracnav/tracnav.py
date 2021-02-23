@@ -70,18 +70,21 @@ from trac.config import BoolOption
 TRACNAVHOME = "https://svn.ipd.kit.edu/trac/javaparty/wiki/TracNav"
 LISTRULE = re.compile(r"^(?P<indent>[ \t\v]+)\* +(?P<rest>.*)$", re.M)
 
+
 # Python 2.4 compatibility
 def _partition(s, c):
     i = s.find(c)
     if i >= 0:
-        return s[:i], s[i+len(c):]
+        return s[:i], s[i + len(c) :]
     return s, ''
+
 
 class TocFormatter(OneLinerFormatter):
     """
     Basically the OneLinerFormatter, but additionally remembers the
     last wiki link.
     """
+
     def __init__(self, env, ctx, allowed_macros=[]):
         OneLinerFormatter.__init__(self, env, ctx)
         self.lastlink = None
@@ -97,8 +100,7 @@ class TocFormatter(OneLinerFormatter):
     def _make_link(self, namespace, target, *args):
         if namespace == 'wiki':
             self.lastlink = target
-        return OneLinerFormatter._make_link(
-            self, namespace, target, *args)
+        return OneLinerFormatter._make_link(self, namespace, target, *args)
 
     def _macro_formatter(self, match, fullmatch, macro=None):
         name = fullmatch.group('macroname')
@@ -117,7 +119,6 @@ class TocFormatter(OneLinerFormatter):
 
 
 class Invocation(object):
-
     def __init__(self, formatter, args):
 
         # shortcuts
@@ -184,7 +185,7 @@ class Invocation(object):
             yield indent
             yield link, label
 
-    def _parse_toc(self, gen, next_indent, level = 0):
+    def _parse_toc(self, gen, next_indent, level=0):
         """
         Construct the toc tree at the given level.
         """
@@ -226,7 +227,7 @@ class Invocation(object):
         out.append(tag.h2(tag.a("TracNav", href=TRACNAVHOME)))
 
         # add TOCs
-        for name in (self.names or ["TOC"]):
+        for name in self.names or ["TOC"]:
             toc = self.parse_toc(self.get_toc(name))
             if not toc:
                 toc = self.parse_toc(' * TOC "%s" is empty!' % name)
@@ -242,7 +243,7 @@ class Invocation(object):
         # done
         return out
 
-    def filter_toc(self, toc, level = 0, found = False):
+    def filter_toc(self, toc, level=0, found=False):
         result = []
         for name, title, sub in toc:
             foundhere = name == self.curpage
@@ -259,17 +260,22 @@ class Invocation(object):
 
     def display_all(self, name, toc, out):
         if (not self.preview) and self.modify:
-            out.append(tag.div(
+            out.append(
+                tag.div(
                     tag.a("edit", href="%s?action=edit" % self.req.href.wiki(name)),
-                    class_="edit"))
+                    class_="edit",
+                )
+            )
         out.append(self.display(toc, tag.ul()))
 
     def display(self, toc, ul):
         for name, title, sub in toc:
             if sub is None:
-                ul.append(tag.li(
-                        Markup(title),
-                        class_="active" if name == self.curpage else None))
+                ul.append(
+                    tag.li(
+                        Markup(title), class_="active" if name == self.curpage else None
+                    )
+                )
             else:
                 dots = u"\u2026" if name is not None and not sub else None
                 ul.append(tag.li(Markup(title), dots))
@@ -283,8 +289,12 @@ class TracNav(Component):
     implements(IWikiMacroProvider, ITemplateProvider)
 
     # global configuration otions
-    provide_jpnav = BoolOption('tracnav', 'provide_jpnav', default=False,
-                               doc='''Legacy: Also provide macro as 'JPNav'.''')
+    provide_jpnav = BoolOption(
+        'tracnav',
+        'provide_jpnav',
+        default=False,
+        doc="Legacy: Also provide macro as 'JPNav'.",
+    )
 
     def get_macros(self):
         yield 'TracNav'
@@ -297,10 +307,12 @@ class TracNav(Component):
 
     def get_macro_description(self, name):
         from inspect import getdoc, getmodule
+
         return getdoc(getmodule(self))
 
     def get_htdocs_dirs(self):
         from pkg_resources import resource_filename
+
         yield ('tracnav', resource_filename(__name__, 'htdocs'))
 
     def get_templates_dirs(self):
