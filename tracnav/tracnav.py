@@ -54,8 +54,6 @@ MA 02110-1301, USA.
 }}}
 
 """
-__id__        = '$Id$'
-__revision__  = '$LastChangedRevision$'
 
 import re
 from io import StringIO
