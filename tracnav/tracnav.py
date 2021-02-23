@@ -185,7 +185,7 @@ class Invocation(object):
         """
         while True:
             try:
-                indent, link, label = gen.next()
+                indent, link, label = next(gen)
             except StopIteration:
                 yield -1
                 return
@@ -205,7 +205,7 @@ class Invocation(object):
                 toclist.append((None, None, sublist))
         while True:
             if next_indent == level:
-                (link, label), next_indent = gen.next(), gen.next()
+                (link, label), next_indent = next(gen), next(gen)
                 if next_indent > level:
                     sublist, next_indent = self._parse_toc(gen, next_indent, level + 1)
                     toclist.append((link, label, sublist))
@@ -220,7 +220,7 @@ class Invocation(object):
         Recursively construct the toc tree using _parse_toc().
         """
         gen = self.get_toc_entry_and_indent(self.get_toc_entry(toc_text))
-        toc, _ = self._parse_toc(gen, gen.next())
+        toc, _ = self._parse_toc(gen, next(gen))
         return toc
 
     def run(self):
