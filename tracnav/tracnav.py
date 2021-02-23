@@ -143,7 +143,7 @@ class Invocation(object):
         self.reorder = True
         self.allowed_macros = 'Image'
         if args:
-            for arg, values in map(lambda s: _partition(s, '='), args.split('|')):
+            for arg, values in [_partition(s, '=') for s in args.split('|')]:
                 arg = arg.strip()
                 if arg == 'nocollapse':
                     self.collapse = False
@@ -152,7 +152,7 @@ class Invocation(object):
                 elif arg == 'noreorder':
                     self.reorder = False
                 elif arg == 'allowed_macros':
-                    self.allowed_macros = map(lambda s: s.strip(), values.split(','))
+                    self.allowed_macros = [s.strip() for s in values.split(',')]
                 else:
                     self.names.append(arg)
 
