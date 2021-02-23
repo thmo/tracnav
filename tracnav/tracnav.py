@@ -58,6 +58,7 @@ __id__        = '$Id$'
 __revision__  = '$LastChangedRevision$'
 
 import re
+from io import StringIO
 from trac.core import Component, implements
 from trac.wiki.api import WikiSystem, IWikiMacroProvider
 from trac.web.chrome import ITemplateProvider, add_stylesheet
@@ -67,7 +68,6 @@ from trac.util.html import Markup
 from trac.util import arity
 from trac.config import BoolOption
 from genshi.builder import tag
-from StringIO import StringIO
 
 
 TRACNAVHOME = "https://svn.ipd.kit.edu/trac/javaparty/wiki/TracNav"
