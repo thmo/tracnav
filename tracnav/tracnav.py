@@ -78,8 +78,7 @@ def _partition(s, c):
     i = s.find(c)
     if i >= 0:
         return s[:i], s[i+len(c):]
-    else:
-        return s, ''
+    return s, ''
 
 class TocFormatter(OneLinerFormatter):
     """
@@ -110,14 +109,11 @@ class TocFormatter(OneLinerFormatter):
             # leapfrog the OneLinerFormatter
             if self.mf_argcount == 4:
                 return Formatter._macro_formatter(self, match, fullmatch, macro)
-            else:
-                return Formatter._macro_formatter(self, match, fullmatch)
-        else:
-            # use the OneLinerFormatter
-            if self.mf_argcount == 4:
-                return OneLinerFormatter._macro_formatter(self, match, fullmatch, macro)
-            else:
-                return OneLinerFormatter._macro_formatter(self, match, fullmatch)
+            return Formatter._macro_formatter(self, match, fullmatch)
+        # use the OneLinerFormatter
+        if self.mf_argcount == 4:
+            return OneLinerFormatter._macro_formatter(self, match, fullmatch, macro)
+        return OneLinerFormatter._macro_formatter(self, match, fullmatch)
 
     # FIXME: what about _make_relative_link() ?
     # FIXME: CamelCase links are special and not handled by the Formatter...
@@ -162,10 +158,9 @@ class Invocation(object):
         """
         if self.preview and name == self.curpage:
             return self.req.args.get('text', '')
-        elif WikiSystem(self.env).has_page(name):
+        if WikiSystem(self.env).has_page(name):
             return WikiPage(self.env, name).text
-        else:
-            return ''
+        return ''
 
     def get_toc_entry(self, toc_text):
         """
@@ -199,10 +194,11 @@ class Invocation(object):
         toclist = []
         if next_indent > level:
             sublist, next_indent = self._parse_toc(gen, next_indent, level + 1)
-            if next_indent < level: # level is empty
+            if next_indent < level:
+                # level is empty
                 return sublist, next_indent
-            else:                   # broken indentation structure
-                toclist.append((None, None, sublist))
+            # broken indentation structure
+            toclist.append((None, None, sublist))
         while True:
             if next_indent == level:
                 (link, label), next_indent = next(gen), next(gen)
