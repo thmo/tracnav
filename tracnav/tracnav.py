@@ -71,14 +71,6 @@ TRACNAVHOME = "https://svn.ipd.kit.edu/trac/javaparty/wiki/TracNav"
 LISTRULE = re.compile(r"^(?P<indent>[ \t\v]+)\* +(?P<rest>.*)$", re.M)
 
 
-# Python 2.4 compatibility
-def _partition(s, c):
-    i = s.find(c)
-    if i >= 0:
-        return s[:i], s[i + len(c) :]
-    return s, ''
-
-
 class TocFormatter(OneLinerFormatter):
     """
     Basically the OneLinerFormatter, but additionally remembers the
@@ -137,7 +129,7 @@ class Invocation(object):
         self.reorder = True
         self.allowed_macros = 'Image'
         if args:
-            for arg, values in [_partition(s, '=') for s in args.split('|')]:
+            for arg, _, values in [s.partition('=') for s in args.split('|')]:
                 arg = arg.strip()
                 if arg == 'nocollapse':
                     self.collapse = False
