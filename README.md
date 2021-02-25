@@ -1,12 +1,8 @@
-----------------------------------------------------------------------
-TracNav Plugin for Trac
-----------------------------------------------------------------------
+# TracNav Plugin for Trac
 
+## Description
 
-Description
------------
-
-The [[TracNav]] macro implements a fully customizable navigation bar
+The `[[TracNav]]` macro implements a fully customizable navigation bar
 for the Trac wiki engine. The contents of the navigation bar is a wiki
 page itself and can be edited like any other wiki page through the web
 interface. The navigation bar supports hierarchical ordering of
@@ -15,9 +11,7 @@ that was originally supplied with Trac. The drawback of TracGuideToc
 is that it is not customizable without editing its source code and
 that it does not support hierarchical ordering.
 
-
-Usage
------
+## Usage
 
 To use TracNav, create an index page for your site and call the
 TracNav macro on each page, where the navigation bar should be
@@ -32,41 +26,35 @@ argument.
 It is possible to have more than one index page for your toc: Simply
 list them all separated by a bar like this:
 
-[[TracNav(MyTOC|AnotherTOC)]]
+    [[TracNav(MyTOC|AnotherTOC)]]
 
 The TOCs are appended to each other to form one navigation bar.
 
-
-Installation
-------------
+## Installation
 
 See http://trac.edgewall.org/wiki/TracPlugins.
 
-Short version for the impatient: run "python ./setup.py bdist_egg" and
-copy the resulting .egg file from the "dist" directory to the
-"plugins" directory of your Trac project. Using the WebAdmin plugin,
-you can even upload and deploy the .egg file to your project using a
+Short version for the impatient: run `python ./setup.py bdist_egg` and
+copy the resulting `.egg` file from the `dist` directory to the
+`plugins` directory of your Trac project. Using the WebAdmin plugin,
+you can even upload and deploy the `.egg` file to your project using a
 browser.
 
 It is very likely that you have to override the location of the
-temporary directory to which .egg files are unpacked by setting the
-PYTHON_EGG_CACHE environment variable in your webserver's
+temporary directory to which `.egg` files are unpacked by setting the
+`PYTHON_EGG_CACHE` environment variable in your webserver's
 configuration, see
 http://trac.edgewall.org/wiki/TracPlugins#SettingupthePluginCache.
 
-
-Homepage
---------
+## Homepage
 
 See https://svn.ipd.kit.edu/trac/javaparty/wiki/TracNav.
 This page contains a life demo of the plugin, too.
 
+## Authors and License
 
-Authors and License
--------------------
-
-Copyright 2005-2006, Bernhard Haumacher (haui at haumacher.de)
-Copyright 2005-2021, Thomas Moschny (thomas.moschny at gmx.de)
+- Copyright 2005-2006, Bernhard Haumacher (<span>haui at haumacher.de</span>)
+- Copyright 2005-2021, Thomas Moschny (<span>thomas.moschny at gmx.de</span>)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
