@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
-from tracnav import __version__ as VERSION
 from setuptools import setup
 
 setup(
     name='TracNav',
-    version=VERSION,
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     packages=['tracnav'],
     package_data={'tracnav': ['htdocs/css/*.css']},
     author='Bernhard Haumacher',
